@@ -1,4 +1,4 @@
-# Weather-Journal App Project
+# Capstone Project Travel App for Udacity Nanodegree
 
 ## Overview
 In this project I created an asynchronous web app that uses Web API and user data to dynamically update the UI with Data from the OpenWeatherMap API.
