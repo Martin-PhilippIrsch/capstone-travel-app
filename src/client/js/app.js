@@ -6,8 +6,6 @@ const apiKey = '&appid=b1e4acaf20b9ba652fd4325adbc2cac0';
 // let exampleRequestUS = `${baseURL}zip=94040,us${apiKey}`;
 // let exampleRequestDE = `${baseURL}zip=73733,de${apiKey}`;
 
-setTimeout(document.getElementById('generate').addEventListener('click', generateAction), 0);
-
 function generateAction(evt) {
     const zip = document.getElementById('zip').value;
     const userResp = document.getElementById('feelings').value;
@@ -79,3 +77,5 @@ const postData = async(url = '', data = {}) => {
         console.log("error", error);
     }
 }
+
+export { generateAction }

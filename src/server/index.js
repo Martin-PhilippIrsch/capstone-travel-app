@@ -3,6 +3,7 @@
 
 // Setup empty JS object to act as endpoint for all routes
 projectData = {};
+const path = require('path')
 
 // Require Express to run server and routes
 const express = require('express');
@@ -21,15 +22,36 @@ const cors = require('cors');
 app.use(cors());
 
 // Initialize the main project folder
-app.use(express.static('website'));
+app.use(express.static('dist'));
+
+
+
+// webpack middleware development
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+// development!
+const config = require('../../webpack.dev');
+const compiler = webpack(config);
+
+// Tell express to use the webpack-dev-middleware and use the webpack.config.js
+// configuration file as a base.
+app.use(webpackDevMiddleware(compiler, {
+    publicPath: config.output.publicPath,
+}));
+
+// environment variables
+const dotenv = require('dotenv');
+dotenv.config();
+
+console.log(`Your API key is ${process.env.API_KEY}`);
 
 
 // Setup Server
-const port = 3000;
-const server = app.listen(port, listening);
+var PORT = 8081;
+const server = app.listen(PORT, listening);
 
 function listening() {
-    console.log(`running on localhost: ${port}`);
+    console.log(`running on localhost: ${PORT}`);
 };
 
 // GET route returning projectData
