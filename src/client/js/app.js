@@ -7,12 +7,16 @@ const apiKey = '&appid=b1e4acaf20b9ba652fd4325adbc2cac0';
 // let exampleRequestDE = `${baseURL}zip=73733,de${apiKey}`;
 
 function generateAction(evt) {
-    const zip = document.getElementById('zip').value;
+    const zipCode = document.getElementById('zip').value;
     const userResp = document.getElementById('feelings').value;
-    getWeatherData(baseURL, zip, apiKey)
+
+    // test if value is empty
+
+    reqWeatherData('/reqweatherdata', { zip: zipCode })
         // use data with then function
         .then(function(data) {
             // POST Data
+            console.log(data)
             postData('/addEntry', { key: entryKey, date: newDate, temp: data.main.temp, user: userResp })
                 // Update GUI?
             updateGUI();
@@ -45,20 +49,41 @@ let entryKey = `${correctMonth}${d.getDate()}${d.getFullYear()}`;
 // console.log(entryKey);
 // console.log(newDate);
 
-const getWeatherData = async(baseURL, zip, apiKey) => {
+// receive weather data, make post request
+const reqWeatherData = async(url = '', data = {}) => {
+    // make post request here 
+    const request = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const allData = await request.json();
+    console.log(`Weather data received! Temp: ${allData}`)
+    return allData;
+    // try {
+    //     const allData = await request.json();
+    //     console.log(`Weather data received! Temp: ${allData}`)
+    //     return allData;
+    // } catch (error) {
+    //     console.log("error", error);
+    // }
 
-    const res = await fetch(`${baseURL}zip=${zip},us${apiKey}`)
+}
 
+const getWeatherData = async() => {
+    const request = await fetch('/getweatherdata');
     try {
-        const data = await res.json();
-        console.log("Weather data received!")
-            // console.log(data);
-        console.log(data.main.temp)
-        return data;
+        const weatherData = await request.json();
+        console.log(`Received ${weatherData}`);
+        return weatherData;
     } catch (error) {
         console.log("error", error);
-    };
-};
+    }
+
+}
 
 const postData = async(url = '', data = {}) => {
     const response = await fetch(url, {
