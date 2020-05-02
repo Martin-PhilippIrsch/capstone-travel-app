@@ -43,6 +43,8 @@ app.use(webpackDevMiddleware(compiler, {
 const dotenv = require('dotenv');
 dotenv.config();
 
+// get the environment variables
+
 // Setup Server
 var PORT = 8081;
 const server = app.listen(PORT, listening);
@@ -60,7 +62,7 @@ app.get('/', function(req, res) {
 /* Global Variables */
 const baseURL = 'https://api.openweathermap.org/data/2.5/weather?'
     // zip={zip code},{country code}
-const apiKeyWeather = '&appid=b1e4acaf20b9ba652fd4325adbc2cac0';
+const apiKeyWeather = process.env.API_KEY_WEATHER;
 
 console.log(`Your API key is ${process.env.API_KEY_WEATHER}`);
 
@@ -68,7 +70,7 @@ console.log(`Your API key is ${process.env.API_KEY_WEATHER}`);
 // returning Weather Data
 const getWeatherData = async(zip) => {
 
-    const res = await fetch(`${baseURL}zip=${zip},us${process.env.API_KEY_WEATHER}`)
+    const res = await fetch(`${baseURL}zip=${zip},us${apiKeyWeather}`)
 
     try {
         const data = await res.json();
@@ -105,6 +107,44 @@ app.post('/reqweatherdata', async(req, res, next) => {
         return next(e)
     }
 });
+
+// *************************************
+// Geoinformation Requests
+// POST Route
+app.post('/geoinfo', async(req, res, next) => {
+    try {
+        // get the name of city code
+        const city = req.body.city;
+        console.log(`POST request to receive geoinformation data for ${city}`);
+
+        // TODO: check if city input is valid
+
+        // await is important here
+        const data = await getGeoinformation(city);
+        res.send(data)
+
+    } catch (e) {
+        return next(e)
+    }
+});
+
+// function to fetch the geoinformation data from api
+const getGeoinformation = async(city) => {
+    const geoAPIKey = process.env.geoAPIKey;
+    // const cityTest = 'London'
+    const geoEndpoint = `http://api.geonames.org/searchJSON?formatted=true&q=${city}&username=${geoAPIKey}`;
+
+    const res = await fetch(geoEndpoint)
+
+    try {
+        const data = await res.json();
+        console.log(`Geoinformation data received!`)
+        return data.geonames[0]
+
+    } catch (error) {
+        console.log("error", error);
+    };
+};
 
 
 // GET route returning projectData

@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div id="app">
+    <div class="app">
         <div class="holder headline">
             Weather Journal App
         </div>
@@ -31,6 +31,46 @@
             </div>
         </div>
     </div>
+    <section class="app">
+        <div class="holder zip">
+            <label for="cityname">Enter Name of City here</label>
+            <!-- <input type="text" id="cityname" placeholder="e.g. Edinburgh" minlength="4" required> -->
+            <input type="text" id="cityname" value="Edinburgh" minlength="4" required>
+
+            <label for="traveldate">Enter <em>Start date</em> of planned travel</label>
+            <input type="date" id="traveldate" value="2021-05-21">
+
+            <label for="enddate">Enter <em>End date</em> of planned travel</label>
+            <input type="date" id="enddate" value="2021-06-04">
+
+            <!-- The button starts our travel app operation -->
+            <button id="geoinformation" type="button"> Get geoinformation</button>
+        </div>
+        <div class="holder entry">
+            <div class="title">Time until travel day</div>
+
+            <div id="entryHolderCount">
+                <div id="countdown-days"></div>
+            </div>
+            <div class="title">Length of trip</div>
+
+            <div id="entryHolderLength">
+                <div id="triplength-days"></div>
+            </div>
+        </div>
+        <div class="holder entry">
+            <div class="title">Geoinformation Entry</div>
+
+            <div id="entryHolderGeo">
+                <div id="geo-city"></div>
+                <div id="geo-country"></div>
+                <div id="geo-population"></div>
+                <div id="geo-longitude"></div>
+                <div id="geo-latitude"></div>
+            </div>
+        </div>
+        </div>
+    </section>
     <!-- <script>
         // Check that service workers are supported
         if ('serviceWorker' in navigator) {

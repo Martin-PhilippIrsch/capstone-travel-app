@@ -3,7 +3,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-#app {
+.app {
     display: grid;
     grid-auto-rows: minmax(100px, auto);
     grid-template-columns: 1fr;
@@ -27,6 +27,10 @@ body {
     visibility: hidden;
 }
 
+#entryHolderGeo {
+    visibility: hidden;
+}
+
 #zip:invalid {
     border: 2px dashed red;
 }
@@ -37,6 +41,14 @@ body {
 
 #zip:valid:required {
     border: 2px solid black;
+}
+
+#countdown-days {
+    font-size: 1.5em;
+}
+
+#triplength-days {
+    font-size: 1.5em;
 }
 
 #date {}
