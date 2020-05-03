@@ -32,19 +32,22 @@
         </div>
     </div>
     <section class="app">
-        <div class="holder zip">
+        <div class="holder headline">
+            The Ultimate trip planner
+        </div>
+        <div class="holder trip">
             <label for="cityname">Enter Name of City here</label>
             <!-- <input type="text" id="cityname" placeholder="e.g. Edinburgh" minlength="4" required> -->
             <input type="text" id="cityname" value="Edinburgh" minlength="4" required>
 
-            <label for="traveldate">Enter <em>Start date</em> of planned travel</label>
+            <label for="traveldate">Enter <em>Start date</em></label>
             <input type="date" id="traveldate" value="2021-05-21">
 
-            <label for="enddate">Enter <em>End date</em> of planned travel</label>
+            <label for="enddate">Enter <em>End date</em></label>
             <input type="date" id="enddate" value="2021-06-04">
 
             <!-- The button starts our travel app operation -->
-            <button id="geoinformation" type="button"> Get geoinformation</button>
+            <button id="geoinformation" type="button"> Gather trip data</button>
         </div>
         <div class="holder entry">
             <div class="title">Time until travel day</div>
@@ -68,6 +71,39 @@
                 <div id="geo-longitude"></div>
                 <div id="geo-latitude"></div>
             </div>
+        </div>
+        <div class="holder entry">
+            <div class="title">Weather information</div>
+
+            <div id="entryHolderWeather">
+                <div class="post-card" id="weather-0-frcst"></div>
+                <div class="post-card" id="weather-1-frcst"></div>
+                <div class="post-card" id="weather-2-frcst"></div>
+                <div class="post-card" id="weather-3-frcst"></div>
+                <div class="post-card" id="weather-4-frcst"></div>
+                <div class="post-card" id="weather-5-frcst"></div>
+            </div>
+
+        </div>
+        <div class="holder entry">
+            <div class="title">Images from the trip location</div>
+
+            <div id="entryHolderPixa">
+                <img id="pixa-0">
+                <img id="pixa-1">
+                <img id="pixa-2">
+            </div>
+
+        </div>
+        <div class="holder entry">
+            <div class="title">Images from the country of the trip location</div>
+
+            <div id="entryHolderPixaCountry">
+                <img id="pixa-country-0">
+                <img id="pixa-country-1">
+                <img id="pixa-country-2">
+            </div>
+
         </div>
         </div>
     </section>

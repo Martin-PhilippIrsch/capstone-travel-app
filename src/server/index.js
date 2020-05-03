@@ -146,6 +146,113 @@ const getGeoinformation = async(city) => {
     };
 };
 
+// ***************************************
+// ******** Weatherbit API ***************
+// ***************************************
+
+app.post('/weatherinfo', async(req, res, next) => {
+    try {
+        // get the name of city code
+        const city = req.body.city;
+        const lat = req.body.lat;
+        const long = req.body.long;
+        console.log(`POST request to receive weather information data for ${city}`);
+        console.log(`lat: ${lat}, long: ${long}`);
+
+        // TODO: check if city input is valid
+
+        // await is important here
+        const today = await getWeatherinformation(city, lat, long);
+
+        const forecast = await getWeatherForecast(city, lat, long);
+        res.send({ tdy: today, frcst: forecast });
+
+    } catch (e) {
+        return next(e)
+    }
+});
+
+// function to fetch the geoinformation data from api
+const getWeatherinformation = async(city, lat, long) => {
+    const weatherbitKey = process.env.weatherbitKey;
+    const weatherEndpoint = `https://api.weatherbit.io/v2.0/current?&lat=${lat}&lon=${long}&key=${weatherbitKey}`;
+
+    const res = await fetch(weatherEndpoint)
+
+    try {
+        const data = await res.json();
+        console.log(`Weatherbit information data received! ${data}`)
+            // current weather
+            // forecast next 5 days
+
+        return data //.data[0]
+
+    } catch (error) {
+        console.log("error", error);
+    };
+};
+// Get forecast for next days
+const getWeatherForecast = async(city, lat, long) => {
+    const weatherbitKey = process.env.weatherbitKey;
+    const weatherEndpoint = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${long}&key=${weatherbitKey}`;
+
+    const res = await fetch(weatherEndpoint)
+
+    try {
+        const data = await res.json();
+        console.log(`Weatherbit forecast data received! ${data}`)
+            // current weather
+            // forecast next 5 days
+
+        return data //.data[0]
+
+    } catch (error) {
+        console.log("error", error);
+    };
+};
+
+// ***************************************
+// ******** Pixabay API ***************
+// ***************************************
+// pixaKey
+
+app.post('/pixainfo', async(req, res, next) => {
+    try {
+        // get the name of city code
+        const city = req.body.city;
+        const country = req.body.country;
+
+        console.log(`POST request to receive pixabay image for ${city} in ${country}`);
+        // TODO: check if city input is valid
+
+        // await is important here
+        const imageDataCity = await getPixaImage(city);
+        const imageDataCountry = await getPixaImage(country);
+        res.send({
+            city: imageDataCity,
+            country: imageDataCountry
+        });
+
+    } catch (e) {
+        return next(e)
+    }
+});
+
+const getPixaImage = async(location) => {
+    const pixaKey = process.env.pixaKey;
+    const pixaEndpoint = `https://pixabay.com/api/?key=${pixaKey}&q=${location}&image_type=photo`;
+
+    const res = await fetch(pixaEndpoint)
+
+    try {
+        const data = await res.json();
+        console.log(`PixaBay Image data received! ${data}`)
+        return data
+
+    } catch (error) {
+        console.log("error", error);
+    };
+};
 
 // GET route returning projectData
 app.get('/getdata', function(req, res) {
