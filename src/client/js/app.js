@@ -1,56 +1,59 @@
-/* Global Variables */
-const baseURL = 'https://api.openweathermap.org/data/2.5/weather?'
-    // zip={zip code},{country code}
-const apiKey = '&appid=b1e4acaf20b9ba652fd4325adbc2cac0';
+function generateFullAction(evt) {
 
-// let exampleRequestUS = `${baseURL}zip=94040,us${apiKey}`;
-// let exampleRequestDE = `${baseURL}zip=73733,de${apiKey}`;
+    const nameCity = document.getElementById('cityname').value;
+    // test the input
 
-function generateAction(evt) {
-    const zipCode = document.getElementById('zip').value;
-    const userResp = document.getElementById('feelings').value;
+    if (!testNameCity(nameCity)) {
+        alert('Our preliminary city name check shows that you have used an invalid city name.')
+        return;
+    };
 
-    // test if value is empty
 
-    reqWeatherData('/reqweatherdata', { zip: zipCode })
+    reqGeoinformation('/geoinfo', { city: nameCity })
         // use data with then function
         .then(function(data) {
-            // POST Data
-            console.log(data)
-            postData('/addEntry', { key: entryKey, date: newDate, temp: data.main.temp, user: userResp })
-                // Update GUI?
-            updateGUI();
-        })
+            // TODO: PostDATA to Server for Logging
+            // postData('/addEntry', { key: entryKey, date: newDate, temp: data.main.temp, user: userResp })
+            //Update GUI
+            updateGeoGUI(data);
+            reqWeatherInformation('/weatherinfo', { city: data.name, lat: data.lat, long: data.lng })
+                .then(function(data) {
+                    updateWeatherGUI(data);
+                    const entries = document.getElementsByClassName('entry');
+                    for (let i = 0; i < entries.length; i++) {
+                        entries[i].style.visibility = 'visible';
+                    }
+                });
+            console.log(data.name, data.countryName)
+            reqImage('/pixainfo', { city: data.name, country: data.countryName })
+                .then(function(data) {
+                    updateImageGUI(data);
+                });
+        });
+
+    makeCountdown();
+
+
 };
 
-// update the GUI
-const updateGUI = async() => {
-    const request = await fetch('/getdata');
-    try {
-        const allData = await request.json();
-        const degreeC = Math.round(parseFloat(allData[entryKey].temp) - 273.15);
-        document.getElementById('date').innerHTML = allData[entryKey].date;
-        document.getElementById('temp').innerHTML = `${degreeC} C`;
-        document.getElementById('content').innerHTML = allData[entryKey].user;
-        document.getElementById('entryHolder').style.visibility = 'visible';
-    } catch (error) {
-        console.log("error", error);
+function testNameCity(city) {
+    // check if empty
+    if (city.length === 0) {
+        return false;
     }
-
+    // check if numbers in the string
+    if (/\d/.test(city)) {
+        return false;
+    }
+    // check for unusual characters in city names
+    if (/[`!@#$%^&*()_+-\=\[\]{};':"\\|,.<>\/?~]/.test(city)) {
+        return false;
+    }
+    return true
 }
 
-// Create a new date instance dynamically with JS
-let d = new Date();
-// getMonth is zero indexed
-let correctMonth = d.getMonth() + 1
-let newDate = correctMonth + '.' + d.getDate() + '.' + d.getFullYear();
-let entryKey = `${correctMonth}${d.getDate()}${d.getFullYear()}`;
-
-// console.log(entryKey);
-// console.log(newDate);
-
 // receive weather data, make post request
-const reqWeatherData = async(url = '', data = {}) => {
+const reqImage = async(url = '', data = {}) => {
     // make post request here 
     const request = await fetch(url, {
         method: 'POST',
@@ -61,30 +64,144 @@ const reqWeatherData = async(url = '', data = {}) => {
         body: JSON.stringify(data),
     });
     const allData = await request.json();
-    console.log(`Weather data received! Temp: ${allData}`)
+    console.log(`Pixabay received!`)
     return allData;
-    // try {
-    //     const allData = await request.json();
-    //     console.log(`Weather data received! Temp: ${allData}`)
-    //     return allData;
-    // } catch (error) {
-    //     console.log("error", error);
-    // }
-
 }
 
-const getWeatherData = async() => {
-    const request = await fetch('/getweatherdata');
+// receive weather data, make post request
+const reqWeatherInformation = async(url = '', data = {}) => {
+    // make post request here 
+    const request = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const allData = await request.json();
+    console.log(`Weatherbit data received!`)
+    return allData;
+}
+
+// update the Weather GUI
+const updateWeatherGUI = async(data) => {
+
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     try {
-        const weatherData = await request.json();
-        console.log(`Received ${weatherData}`);
-        return weatherData;
+        document.getElementById('weather-0-frcst').innerHTML = `
+                    <div>Today</div>
+                    <figure>
+                        <img src="https://www.weatherbit.io/static/img/icons/${data.frcst.data[0].weather.icon}.png" alt="Weather">
+                        <figcaption>${data.frcst.data[0].weather.description}</figcaption>
+                    </figure>
+                    <div>High ${data.frcst.data[0].high_temp}C, Low ${data.frcst.data[0].low_temp}C</div>
+                    `;
+
+
+        for (let i = 1; i < 6; i++) {
+            let d = new Date(data.frcst.data[i].valid_date);
+            let dayName = days[d.getDay()];
+
+            document.getElementById(`weather-${i}-frcst`).innerHTML = `
+                    <div>${dayName}, ${data.frcst.data[i].valid_date}</div>
+                    <figure>
+                        <img src="https://www.weatherbit.io/static/img/icons/${data.frcst.data[i].weather.icon}.png" alt="Weather">
+                        <figcaption>${data.frcst.data[i].weather.description}</figcaption>
+                    </figure>
+                    <div>High ${data.frcst.data[i].high_temp}C, Low ${data.frcst.data[i].low_temp}C</div>
+                    `;
+        }
+
+        document.getElementById('entryHolderWeather').style.visibility = 'visible';
     } catch (error) {
         console.log("error", error);
     }
 
 }
 
+// receive geo data, make post request
+const reqGeoinformation = async(url = '', data = {}) => {
+    // make post request here 
+    const request = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const allData = await request.json();
+    console.log(`Geoinfo data received!`)
+    return allData;
+}
+
+// update the Geo GUI
+const updateGeoGUI = async(data) => {
+    // const request = await fetch('/getdata');
+    try {
+        document.getElementById('geo-city').innerHTML = `City of ${data.toponymName} in ${data.adminName1}`;
+        document.getElementById('geo-country').innerHTML = `Country: ${data.countryName}`;
+        document.getElementById('geo-population').innerHTML = `Population: ${data.population}`;
+        document.getElementById('geo-latitude').innerHTML = `Latitude: ${data.lat}`;
+        document.getElementById('geo-longitude').innerHTML = `Longitude: ${data.lng}`;
+        document.getElementById('entryHolderGeo').style.visibility = 'visible';
+    } catch (error) {
+        console.log("error", error);
+    }
+
+}
+
+function makeCountdown() {
+
+    const travelDate = document.getElementById('traveldate').value
+
+    var t = Date.parse(travelDate) - Date.parse(new Date()); // parse to milliseconds
+    const numDays = Math.floor(t / (1000 * 60 * 60 * 24)); // convert from millisecond to days
+    document.getElementById('countdown-days').innerHTML = `${numDays} days left...`;
+
+    // calculate triplength
+    const endDate = document.getElementById('enddate').value
+
+    const l = Date.parse(endDate) - Date.parse(travelDate);
+    const triplength = Math.floor(l / (1000 * 60 * 60 * 24)); // convert to days again
+
+    document.getElementById('triplength-days').innerHTML = `Your trip will be for ${triplength} days from ${travelDate} until ${endDate}!`;
+
+    // TODO: PostDATA to Server for Logging
+    // post...
+}
+
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+const updateImageGUI = async(data) => {
+    // const request = await fetch('/getdata');
+    try {
+        // console.log(data.city.hits[imageID1].webformatURL);
+        // console.log(data.country.hits[imageID1].webformatURL);
+        let numberList = Array.from(Array(5), (x, i) => i);
+        const imageIDs = shuffle(numberList)
+        for (let i = 0; i < 3; i++) {
+            const imageID = imageIDs[i];
+            document.getElementById(`pixa-${i}`).src = `${data.city.hits[imageID].webformatURL}`;
+            document.getElementById(`pixa-country-${i}`).src = `${data.country.hits[imageID].webformatURL}`;
+        };
+        document.getElementById('entryHolderPixa').style.visibility = 'visible';
+
+        document.getElementById('entryHolderPixaCountry').style.visibility = 'visible';
+    } catch (error) {
+        console.log("error", error);
+    }
+
+}
+
+// post all the data to the server
 const postData = async(url = '', data = {}) => {
     const response = await fetch(url, {
         method: 'POST',
@@ -103,4 +220,4 @@ const postData = async(url = '', data = {}) => {
     }
 }
 
-export { generateAction }
+export { generateFullAction, testNameCity }

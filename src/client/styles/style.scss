@@ -1,5 +1,5 @@
 body {
-    background: #444;
+    background: lightgray;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -8,7 +8,7 @@ body {
     grid-auto-rows: minmax(100px, auto);
     grid-template-columns: 1fr;
     /* height: 100vh; */
-    color: #f0d43a;
+    color: #0065bf;
     justify-content: center;
     align-self: center;
     grid-gap: 1em;
@@ -57,8 +57,8 @@ img {
 }
 
 .entry {
-    background: rgba(30, 97, 241, 0.4);
-    color: white;
+    background: #444;
+    color: #f0d43a;
     visibility: collapse;
 }
 
@@ -83,7 +83,7 @@ img {
 }
 
 #countdown-days {
-    font-size: 1.5em;
+    font-size: 1.2em;
 }
 
 #triplength-days {
@@ -111,10 +111,13 @@ img {
 #content {}
 
 .headline {
-    font-size: 3em;
+    font-size: 4em;
 }
 
-.title {}
+.title {
+    font-size: 1.5em;
+    font-stretch: expanded;
+}
 
 
 /*  Basic Styling To Override Default For Basic HTML Elements */
@@ -144,6 +147,11 @@ button {
     font-family: 'Oswald', sans-serif;
     border: none;
     box-shadow: 2px 4px 5px #444;
+}
+
+button:hover {
+    background-color: #0065bf;
+    color: #f0d43a;
 }
 
 h1 {
