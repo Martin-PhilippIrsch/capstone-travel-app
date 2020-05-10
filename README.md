@@ -20,7 +20,7 @@ The project content is extended in order to foster a deeper understanding of the
 
 __This is how the form looks__
 
-![A preview of the form](imgs/form.png "A preview of the form")
+![A preview of the form](./imgs/form.png "A preview of the form")
 
 __This is how the result can look__
 
