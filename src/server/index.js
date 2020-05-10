@@ -281,4 +281,5 @@ function addImageInfo(req, res) {
     projectData[city].imgcountry = data.country.hits[0].webformatURL;
 }
 
-// export { apiKeysavailable }
+// export for testing
+exports.apiKeysavailable = apiKeysavailable;
