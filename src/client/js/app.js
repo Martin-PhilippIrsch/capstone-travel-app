@@ -2,38 +2,42 @@ function generateFullAction(evt) {
 
     const nameCity = document.getElementById('cityname').value;
     // test the input
-
     if (!testNameCity(nameCity)) {
         alert('Our preliminary city name check shows that you have used an invalid city name.')
         return;
     };
 
-
     reqGeoinformation('/geoinfo', { city: nameCity })
         // use data with then function
         .then(function(data) {
-            // TODO: PostDATA to Server for Logging
-            // postData('/addEntry', { key: entryKey, date: newDate, temp: data.main.temp, user: userResp })
-            //Update GUI
+            // PostDATA to Server for Logging, city is key
+            postData("/postgeoinfo", { geo: data })
+                //Update GUI
             updateGeoGUI(data);
-            reqWeatherInformation('/weatherinfo', { city: data.name, lat: data.lat, long: data.lng })
+            // no problems with the city name
+            const nameCityNew = data.name;
+            const countdownData = makeCountdown();
+
+            postData("/postcountdowninfo", { city: nameCityNew, countdown: countdownData });
+
+            // using the weather api
+            reqWeatherInformation('/weatherinfo', { city: nameCityNew, lat: data.lat, long: data.lng })
                 .then(function(data) {
                     updateWeatherGUI(data);
                     const entries = document.getElementsByClassName('entry');
                     for (let i = 0; i < entries.length; i++) {
                         entries[i].style.visibility = 'visible';
                     }
+                    postData("/postweatherinfo", { city: nameCityNew, weather: data })
                 });
-            console.log(data.name, data.countryName)
-            reqImage('/pixainfo', { city: data.name, country: data.countryName })
+
+            // using the pixabay API
+            reqImage('/pixainfo', { city: nameCityNew, country: data.countryName })
                 .then(function(data) {
                     updateImageGUI(data);
+                    postData("/postimageinfo", { city: nameCityNew, img: data })
                 });
         });
-
-    makeCountdown();
-
-
 };
 
 function testNameCity(city) {
@@ -167,9 +171,7 @@ function makeCountdown() {
     const triplength = Math.floor(l / (1000 * 60 * 60 * 24)); // convert to days again
 
     document.getElementById('triplength-days').innerHTML = `Your trip will be for ${triplength} days from ${travelDate} until ${endDate}!`;
-
-    // TODO: PostDATA to Server for Logging
-    // post...
+    return { tlength: triplength, days: numDays }
 }
 
 function shuffle(a) {
@@ -219,5 +221,7 @@ const postData = async(url = '', data = {}) => {
         console.log("error", error);
     }
 }
+
+
 
 export { generateFullAction, testNameCity }

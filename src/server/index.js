@@ -1,4 +1,4 @@
-import { TRUE } from "node-sass";
+// import { TRUE } from "node-sass";
 
 // start the server
 const fetch = require("node-fetch");
@@ -125,9 +125,6 @@ app.post('/weatherinfo', async(req, res, next) => {
         console.log(`POST request to receive weather information data for ${city}`);
         console.log(`lat: ${lat}, long: ${long}`);
 
-        // TODO: check if city input is valid
-
-
         // await is important here
         const today = await getWeatherinformation(city, lat, long);
 
@@ -185,8 +182,6 @@ app.post('/pixainfo', async(req, res, next) => {
         const country = req.body.country;
 
         console.log(`POST request to receive pixabay image for ${city} in ${country}`);
-        // TODO: check if city input is valid
-
         // await is important here
         const imageDataCity = await getPixaImage(city);
         const imageDataCountry = await getPixaImage(country);
@@ -222,24 +217,68 @@ app.get('/getdata', function(req, res) {
     console.log(projectData);
 });
 
-// POST addEntry
-app.post('/addEntry', addEntry);
+// POST addEntry in project data
+app.post('/postgeoinfo', addGeoInfo);
 
-function addEntry(req, res) {
+function addGeoInfo(req, res) {
     console.log('POST request');
-    const date = req.body.date;
+    const geoData = req.body.geo;
     //create new entry
     newEntry = {
-        date: req.body.date,
-        temp: req.body.temp,
-        user: req.body.user
+        country: geoData.countryName,
+        state: geoData.adminName1,
+        population: geoData.population,
+        lat: geoData.lat,
+        long: geoData.lng,
     }
 
     // add to project data
-    projectData[req.body.key] = newEntry;
-    // send the response
-    // console.log(projectData);
-    // res.send(projectData);
+    projectData[geoData.name] = newEntry;
 }
 
-export { apiKeysavailable }
+// POST extend city entry in project data
+app.post('/postweatherinfo', addWeatherInfo);
+
+function addWeatherInfo(req, res) {
+    console.log('POST request');
+    const city = req.body.city;
+    const weatherData = req.body.weather;
+
+    // add to project data
+
+    weatherEntry = {
+        description: weatherData.frcst.data[0].weather.description,
+        high: weatherData.frcst.data[0].high_temp,
+        low: weatherData.frcst.data[0].low_temp,
+    }
+
+    projectData[city].weather = weatherEntry;
+}
+
+// POST extend countdown in project data for city entry
+app.post('/postcountdowninfo', addCountdownInfo);
+
+function addCountdownInfo(req, res) {
+    console.log('POST for countdown request');
+    const city = req.body.city;
+    const countdownData = req.body.countdown;
+
+    // add to project data
+    projectData[city].triplength = countdownData.tlength;
+    projectData[city].countdays = countdownData.days;
+}
+
+// POST extend city entry in project data with image info
+app.post('/postimageinfo', addImageInfo);
+
+function addImageInfo(req, res) {
+    console.log('POST for Image Pixabay request');
+    const city = req.body.city;
+    const data = req.body.img;
+
+    // add to project data
+    projectData[city].imgcity = data.city.hits[0].webformatURL;
+    projectData[city].imgcountry = data.country.hits[0].webformatURL;
+}
+
+// export { apiKeysavailable }
